@@ -1,0 +1,38 @@
+QEMU-UTH with error injection
+
+This version of QEMU is patched with Error Injector. It can achieve 1 bit/zero flip in a QEMU space. In details, we add the following implementation:
+write
+ an error generator 
+in ./error_generator, we can run exec.sh 
+to lanuch error injection under i386, x86_64 architectures.
+
+
+The error injector could generate errors with number setting (random bits in random address space)
+In
+ cpus.c, we force qemu 
+to write the error space generated from the error generator. And we set a check point with CPU ticks to monitor the performance of QEMU when error injection happens.
+
+cd $build
+./configure --target-list=i386-softmmu
+make
+make install
+cd ./error_generator
+./exec.sh 
+cd .. 
+The main changed files: cpus.c, cpu-exec.c, exec.c, target-i386/execp-helper.c
+
+Run QEMU commands, e.g., qemu-system-i386 XX.img
+and trace the performance. All src codes are passed through the QEMU compiler and are verified with mem write script.
+Currently, this injector supports i386 arch, I will update it for X86_64 and aarch64 (ARM) in the future. And I will run some benchmarks (especially memory write benckmarks in the KVM) to verify the performance.
+
+UNISERVER QEMU
+==============
+
+QEMU extended interface to simulate mce errors and inject sdc [WIP]
+
+More info:
+  help mce
+
+  help sdc
+
+
